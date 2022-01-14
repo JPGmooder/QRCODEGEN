@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "290591405029",
+    "project_id": "trionproj",
+    "storage_bucket": "trionproj.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290591405029:android:65ea2b32fb70f77eab750c",
+        "android_client_info": {
+          "package_name": "com.example.trionproj"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "290591405029-gueke69r0n0oapvmsjvnmgobuolfguht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trionproj",
+            "certificate_hash": "d1a4e825eac6d5a03ecb1219f31fcdfc36e170a3"
+          }
+        },
+        {
+          "client_id": "290591405029-3ftmlnb73vdg1d5d1cqivjbe0r5fpa2d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnNnIzjBUhdugcj9PPcjetcJdHs_DQLuM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "290591405029-3ftmlnb73vdg1d5d1cqivjbe0r5fpa2d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
