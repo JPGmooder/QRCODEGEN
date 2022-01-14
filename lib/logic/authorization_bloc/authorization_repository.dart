@@ -10,9 +10,12 @@ class AuthorizationRepository {
     if (authAccount == null) {
       throw AuthentificationError(
           "Не удается войти в аккаунт, повторите попытку позже");
-    } else {
-      print(FirebaseAuth.instance.currentUser.toString());
     }
+    var googleAuth = await authAccount.authentication;
+    final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+        
+    await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   static Future<void> signInViaFirebase(String email, String password) async {
@@ -21,9 +24,8 @@ class AuthorizationRepository {
     if (authAccount == null) {
       throw AuthentificationError(
           "Не удается войти в аккаунт, повторите попытку позже");
-    } else {
-      print(FirebaseAuth.instance.currentUser.toString());
     }
+    print(FirebaseAuth.instance.currentUser);
   }
 
   static Future<void> signUpViaFirebase(String email, String password) async {
@@ -34,8 +36,7 @@ class AuthorizationRepository {
       throw AuthentificationError(
           "Не удается войти в аккаунт, повторите попытку позже");
     } else {
-     await authAccount.user!.sendEmailVerification();
-      print(FirebaseAuth.instance.currentUser.toString());
+      await authAccount.user!.sendEmailVerification();
     }
   }
 }

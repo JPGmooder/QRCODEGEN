@@ -255,7 +255,7 @@ class _AuthorizationScreenState extends State<AuthorizationScreen>
                       ConnectViaGoogleButton(
                           onPress: () => context
                               .read<AuthorizationBloc>()
-                              .add(Auth_SignUpViaGoogle(false))),
+                              .signInViaGoogle(false)),
                     ]),
               ),
             ),
