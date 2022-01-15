@@ -12,6 +12,7 @@ import 'package:trionproj/logic/internet_connection_cubit.dart';
 import 'package:trionproj/view/authorization_screen/authorization_screen.dart';
 import 'package:trionproj/view/onboarding_screen/onboarding.dart';
 import 'package:trionproj/view/qr_main_list/qr_main_list.dart';
+import 'package:trionproj/view/single_qrcode_screen/qr_code_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,20 +44,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (ctx) => AuthorizationBloc(),
-        child: MaterialApp(
-            title: 'Material App',
-            home: typeOfAuth == null
-                ? OnBoardingScreen()
-                : AuthRouter(
-                    typeOfAuth: typeOfAuth,
-                    usersCredentials: usersCredentials,
-                  ),
+        child: MaterialApp(title: 'Material App', home: QrMainList(),
+            // typeOfAuth == null
+            //     ? OnBoardingScreen()
+            //     : AuthRouter(
+            //         typeOfAuth: typeOfAuth,
+            //         usersCredentials: usersCredentials,
+            //       ),
             routes: {
               authorizationScreenRoute: (ctx) => BlocProvider.value(
                     value: BlocProvider.of<AuthorizationBloc>(ctx),
                     child: AuthorizationScreen(),
                   ),
-              QRMainList: (ctx) => QrMainList()
+              QRMainList: (ctx) => QrMainList(),
+              "qrtest": (ctx) => SingleQrCodeScreen()
             }));
   }
 
