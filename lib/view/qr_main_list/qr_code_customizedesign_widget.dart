@@ -4,26 +4,32 @@ import 'package:flutter/material.dart';
 import 'package:trionproj/consts/strings.dart';
 
 class CustomeDesignWidget extends StatelessWidget {
-   CustomeDesignWidget({Key? key, required this.Eye, required this.EyeBallShape, required this.Shape}) : super(key: key);
-  String Shape;
-  String Eye;
-  String EyeBallShape;
+  CustomeDesignWidget(
+      {Key? key,
+      required this.pickEyeBallCallback,
+      required this.pickEyeCallback,
+      required this.pickShapeCallback})
+      : super(key: key);
+  void Function(String) pickShapeCallback;
+  void Function(String) pickEyeCallback;
+  void Function(String) pickEyeBallCallback;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         ShapePicker(
-          pickedShape: Shape,
+          callback: pickShapeCallback,
           pickerTitle: Text("Shape: "),
           providedShapes: assetShapes,
         ),
         ShapePicker(
-          pickedShape: Eye,
+          callback: pickEyeCallback,
           pickerTitle: Text("Eye: "),
           providedShapes: assetEyes,
         ),
         ShapePicker(
-          pickedShape: EyeBallShape,
+          callback: pickEyeBallCallback,
           pickerTitle: Text("Eye ball shape: "),
           providedShapes: assetEyeBallShapes,
         )
@@ -34,19 +40,24 @@ class CustomeDesignWidget extends StatelessWidget {
 
 class ShapePicker extends StatefulWidget {
   ShapePicker(
-      {Key? key, required this.providedShapes, required this.pickerTitle, required this.pickedShape})
+      {Key? key,
+      required this.providedShapes,
+      required this.pickerTitle,
+      required this.callback})
       : super(key: key);
   List<String> providedShapes;
-  late String pickedShape;
+  void Function(String) callback;
   Text pickerTitle;
   @override
   _ShapePickerState createState() => _ShapePickerState();
 }
 
 class _ShapePickerState extends State<ShapePicker> {
+  late String pickedShape;
   @override
   void initState() {
-    widget.pickedShape = widget.providedShapes[0];
+    pickedShape = widget.providedShapes[0];
+    widget.callback(pickedShape);
     super.initState();
   }
 
@@ -63,7 +74,7 @@ class _ShapePickerState extends State<ShapePicker> {
             width: size.width * 0.05,
           ),
           DropdownButton<String>(
-              value: widget.pickedShape,
+              value: pickedShape,
               items: widget.providedShapes
                   .map((e) => DropdownMenuItem<String>(
                       value: e,
@@ -76,7 +87,8 @@ class _ShapePickerState extends State<ShapePicker> {
                       )))
                   .toList(),
               onChanged: (s) => setState(() {
-                    widget.pickedShape = s!;
+                    pickedShape = s!;
+                    widget.callback(pickedShape);
                   })),
         ],
       ),

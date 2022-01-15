@@ -15,7 +15,7 @@ class QrCodeAddBody extends StatefulWidget {
   State<QrCodeAddBody> createState() => _QrCodeAddBodyState();
 }
 
-class _QrCodeAddBodyState extends State<QrCodeAddBody> {
+class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
   late TextEditingController linkController;
 //* Setcolors
   late TextEditingController firstcolorController;
@@ -46,10 +46,14 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> {
   }
 
   setcolor.RadioButton radioCurrentValue = setcolor.RadioButton.singleColor;
+  void setRadioCurrentValue(setcolor.RadioButton state) =>
+      this.radioCurrentValue = state;
 
   setcolor.Gradient? currentGradient;
+  void setCurrentGradient(setcolor.Gradient state) => currentGradient = state;
 
   bool isCustomEyeColor = false;
+  void setIsCustomEyeColor(bool state) => isCustomEyeColor = state;
 
   Color firstColor = mainColor;
 
@@ -63,11 +67,17 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> {
 
   String pickedImage = "";
 
+  void setPickedImage(String path) => this.pickedImage = path;
+
   String pickedEye = "";
 
+  void setPickedEye(String path) => this.pickedEye = path;
+
   String pickedEyeBallShape = "";
+  void setpickedEyeBallShape(String path) => this.pickedEyeBallShape = path;
 
   String pickedShape = "";
+  void setpickedShape(String path) => this.pickedShape = path;
 
   @override
   Widget build(BuildContext context) {
@@ -92,15 +102,15 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> {
             widgetIcon: Icons.brush,
             child: SingleChildScrollView(
                 child: setcolor.SetColorContent(
+                    gradientCallBack: setCurrentGradient,
+                    isCustomEyeColorCallBack: setIsCustomEyeColor,
+                    radioCallBack: setRadioCurrentValue,
                     backgroundColor: backgroundColor,
                     backgroundController: backgroundController,
-                    currentGradient: currentGradient,
                     firstColor: firstColor,
                     firstcolorController: firstcolorController,
                     firsteyeColor: firsteyeColor,
                     firsteyecolorController: firsteyecolorController,
-                    isCustomEyeColor: isCustomEyeColor,
-                    radioCurrentValue: radioCurrentValue,
                     secondColor: secondColor,
                     secondcolorController: secondcolorController,
                     secondeyeColor: secondeyeColor,
@@ -112,7 +122,7 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> {
             widgetIcon: Icons.image,
             child: SingleChildScrollView(
               child: AddLogoImageWidget(
-                pathToImage: pickedImage,
+                pathCallBack: setPickedImage,
               ),
             ),
           ),
@@ -121,9 +131,9 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> {
             widgetTitle: "CUSTOMIZE DESIGN",
             widgetIcon: Icons.qr_code_rounded,
             child: CustomeDesignWidget(
-              Eye: this.pickedEye,
-              EyeBallShape: this.pickedEyeBallShape,
-              Shape: this.pickedShape,
+              pickEyeCallback: setPickedEye,
+              pickEyeBallCallback: setpickedEyeBallShape,
+              pickShapeCallback: setpickedShape,
             ),
           ),
           ElevatedButton(

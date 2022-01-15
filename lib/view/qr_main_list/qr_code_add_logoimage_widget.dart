@@ -8,9 +8,8 @@ import 'package:trionproj/logic/qr_images_cubit/qr_images_cubit.dart';
 import 'package:trionproj/logic/qr_images_cubit/qr_images_states.dart';
 
 class AddLogoImageWidget extends StatefulWidget {
-  AddLogoImageWidget({Key? key, required this.pathToImage}) : super(key: key);
-  String pathToImage;
-
+  AddLogoImageWidget({Key? key, required this.pathCallBack}) : super(key: key);
+  void Function(String) pathCallBack;
   var imageList = [];
   @override
   _AddLogoImageWidgetState createState() => _AddLogoImageWidgetState();
@@ -56,7 +55,7 @@ class _AddLogoImageWidgetState extends State<AddLogoImageWidget> {
                                   image.path.endsWith(".svg") ||
                                   image.path.endsWith(".gif"))) {
                             setState(() {
-                              widget.pathToImage = image.path;
+                              widget.pathCallBack(image.path);
                               pickedImage = Image.file(File(image.path));
                             });
                           }
@@ -67,7 +66,7 @@ class _AddLogoImageWidgetState extends State<AddLogoImageWidget> {
                     ElevatedButton(
                       onPressed: () => setState(() {
                         pickedImage = null;
-                        widget.pathToImage = "";
+                        widget.pathCallBack("");
                       }),
                       child: Text("Remove Logo"),
                       style: ElevatedButton.styleFrom(primary: Colors.red[200]),
@@ -89,6 +88,7 @@ class _AddLogoImageWidgetState extends State<AddLogoImageWidget> {
                           .map((e) => GestureDetector(
                                 onTap: () => setState(() {
                                   pickedImage = Image.network(e);
+                                  widget.pathCallBack(e);
                                 }),
                                 child: Image.network(
                                   e,
