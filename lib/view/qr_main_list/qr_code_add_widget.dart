@@ -1,19 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:trionproj/consts/colors.dart';
-import 'package:trionproj/main.dart';
 import 'package:trionproj/models/textstyles.dart';
 import 'package:trionproj/view/qr_main_list/qr_code_add_entercontent_widget.dart';
-import 'package:trionproj/view/qr_main_list/qr_code_add_setcolorscontent_widget.dart';
+import 'package:trionproj/view/qr_main_list/qr_code_add_logoimage_widget.dart';
+import 'package:trionproj/view/qr_main_list/qr_code_add_setcolorscontent_widget.dart'
+    as setcolor;
+import 'package:trionproj/view/qr_main_list/qr_code_customizedesign_widget.dart';
 
-class QrCodeAddBody extends StatelessWidget {
+class QrCodeAddBody extends StatefulWidget {
   QrCodeAddBody({Key? key}) : super(key: key);
-  TextEditingController linkController = TextEditingController();
+  //* EnterContent
+
+  @override
+  State<QrCodeAddBody> createState() => _QrCodeAddBodyState();
+}
+
+class _QrCodeAddBodyState extends State<QrCodeAddBody> {
+  late TextEditingController linkController;
+//* Setcolors
+  late TextEditingController firstcolorController;
+  late TextEditingController secondcolorController;
+  late TextEditingController firsteyecolorController;
+  late TextEditingController secondeyecolorController;
+  late TextEditingController backgroundController;
+  @override
+  void initState() {
+    firstcolorController = TextEditingController();
+    secondcolorController = TextEditingController();
+    firsteyecolorController = TextEditingController();
+    secondeyecolorController = TextEditingController();
+    backgroundController = TextEditingController();
+    linkController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    firstcolorController.dispose();
+    secondcolorController.dispose();
+    firsteyecolorController.dispose();
+    secondeyecolorController.dispose();
+    backgroundController.dispose();
+    linkController.dispose();
+    super.dispose();
+  }
+
+  setcolor.RadioButton radioCurrentValue = setcolor.RadioButton.singleColor;
+
+  setcolor.Gradient? currentGradient;
+
+  bool isCustomEyeColor = false;
+
+  Color firstColor = mainColor;
+
+  Color secondColor = mainColor;
+
+  Color firsteyeColor = mainColor;
+
+  Color secondeyeColor = mainColor;
+
+  Color backgroundColor = Colors.white;
+
+  String pickedImage = "";
+
+  String pickedEye = "";
+
+  String pickedEyeBallShape = "";
+
+  String pickedShape = "";
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return SizedBox(
-      width: size.width * 0.7,
-      height: size.height * 0.5,
+      height: size.height * 0.9,
       child: ListView(
         children: [
           QrCodeAddWidget(
@@ -24,24 +84,65 @@ class QrCodeAddBody extends StatelessWidget {
             widgetIcon: Icons.link,
             widgetTitle: "ENTER CONTENT",
           ),
+
+          //TODO: в сет калорсе не работает текстоввый ввод цвета. Починить.
           QrCodeAddWidget(
             contentHeigh: size.height * 0.4,
             widgetTitle: "SET COLORS",
             widgetIcon: Icons.brush,
-            child: SingleChildScrollView(child: SetColorContent()),
+            child: SingleChildScrollView(
+                child: setcolor.SetColorContent(
+                    backgroundColor: backgroundColor,
+                    backgroundController: backgroundController,
+                    currentGradient: currentGradient,
+                    firstColor: firstColor,
+                    firstcolorController: firstcolorController,
+                    firsteyeColor: firsteyeColor,
+                    firsteyecolorController: firsteyecolorController,
+                    isCustomEyeColor: isCustomEyeColor,
+                    radioCurrentValue: radioCurrentValue,
+                    secondColor: secondColor,
+                    secondcolorController: secondcolorController,
+                    secondeyeColor: secondeyeColor,
+                    secondeyecolorController: secondeyecolorController)),
           ),
           QrCodeAddWidget(
-            contentHeigh: size.height * 0.2,
+            contentHeigh: size.height * 0.3,
             widgetTitle: "ADD LOGO IMAGE",
             widgetIcon: Icons.image,
-            child: Text("Aboba"),
+            child: SingleChildScrollView(
+              child: AddLogoImageWidget(
+                pathToImage: pickedImage,
+              ),
+            ),
           ),
           QrCodeAddWidget(
-            contentHeigh: size.height * 0.2,
+            contentHeigh: size.height * 0.4,
             widgetTitle: "CUSTOMIZE DESIGN",
             widgetIcon: Icons.qr_code_rounded,
-            child: Text("Abreba"),
+            child: CustomeDesignWidget(
+              Eye: this.pickedEye,
+              EyeBallShape: this.pickedEyeBallShape,
+              Shape: this.pickedShape,
+            ),
           ),
+          ElevatedButton(
+              onPressed: () {
+                print(backgroundController.text.toString());
+                print(firstcolorController.text.toString());
+                print(currentGradient);
+                print(firsteyecolorController.text.toString());
+                print(isCustomEyeColor.toString());
+                print(linkController.text.toString());
+                print(pickedEye.toString());
+                print(pickedEyeBallShape.toString());
+                print(pickedImage.toString());
+                print(pickedShape.toString());
+                print(radioCurrentValue.toString());
+                print(secondcolorController.text.toString());
+                print(secondeyecolorController.toString());
+              },
+              child: Text("Lesss goooooo"))
         ],
       ),
     );

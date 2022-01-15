@@ -7,11 +7,6 @@ class QrCodeAddEnterContentWidget extends StatelessWidget {
   TextEditingController controller;
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: CustomTextField(
-        controller: this.controller,
-        text: "Your URL",
-      ),
-    );
+    return SingleChildScrollView(child: CustomTextField(controller: this.controller, text: "Your URL",));
   }
 }

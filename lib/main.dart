@@ -9,6 +9,7 @@ import 'package:trionproj/consts/strings.dart';
 import 'package:trionproj/logic/authorization_bloc/authorization_bloc.dart';
 import 'package:trionproj/logic/authorization_bloc/authorization_states.dart';
 import 'package:trionproj/logic/internet_connection_cubit.dart';
+import 'package:trionproj/logic/qr_images_cubit/qr_images_cubit.dart';
 import 'package:trionproj/view/authorization_screen/authorization_screen.dart';
 import 'package:trionproj/view/onboarding_screen/onboarding.dart';
 import 'package:trionproj/view/qr_main_list/qr_main_list.dart';
@@ -44,7 +45,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (ctx) => AuthorizationBloc(),
-        child: MaterialApp(title: 'Material App', home: QrMainList(),
+        child: MaterialApp(
+            title: 'Material App',
+            home: BlocProvider<QrImagesCubit>(
+                create: (ctx) => QrImagesCubit(), child: QrMainList()),
             // typeOfAuth == null
             //     ? OnBoardingScreen()
             //     : AuthRouter(

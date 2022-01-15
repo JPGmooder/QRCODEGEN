@@ -41,6 +41,7 @@ dependencies:
   flutter_colorpicker: ^1.0.3
   flutter_svg: ^1.0.1
   google_sign_in: ^5.2.2
+  image_picker: ^0.8.4+4
   rxdart: ^0.27.3
   shared_preferences: ^2.0.12
   smooth_page_indicator: ^1.0.0+2
@@ -62,6 +63,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/consts/assets/img/
+    - lib/consts/assets/img/shapes/
+    - lib/consts/assets/img/eye/
+    - lib/consts/assets/img/eyeBallShape/
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

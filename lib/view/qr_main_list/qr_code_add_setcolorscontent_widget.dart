@@ -7,47 +7,53 @@ enum RadioButton { singleColor, gradient }
 enum Gradient { LinearGradient, RadialGradient }
 
 class SetColorContent extends StatefulWidget {
-  SetColorContent({Key? key}) : super(key: key);
-
+  SetColorContent(
+      {Key? key,
+      required this.backgroundColor,
+      required this.backgroundController,
+      required this.firstColor,
+      required this.firstcolorController,
+      required this.firsteyeColor,
+      required this.firsteyecolorController,
+      required this.secondColor,
+      required this.secondcolorController,
+      required this.secondeyeColor,
+      required this.secondeyecolorController,
+      required this.radioCurrentValue,
+      required this.currentGradient,
+      required this.isCustomEyeColor})
+      : super(key: key);
+  bool isCustomEyeColor;
+  Gradient? currentGradient;
+  RadioButton radioCurrentValue;
+  TextEditingController firstcolorController;
+  Color firstColor;
+  TextEditingController secondcolorController;
+  Color secondColor;
+  TextEditingController firsteyecolorController;
+  Color firsteyeColor;
+  TextEditingController secondeyecolorController;
+  Color secondeyeColor;
+  TextEditingController backgroundController;
+  Color backgroundColor;
   @override
   _SetColorContentState createState() => _SetColorContentState();
 }
 
-class _SetColorContentState extends State<SetColorContent> {
-  late RadioButton _radioCurrentValue;
-  Gradient? currentGradient;
-  late bool isCustomEyeColor;
-  late TextEditingController firstcolorController;
-  late Color firstColor;
-  late TextEditingController secondcolorController;
-  late Color secondColor;
-  late TextEditingController firsteyecolorController;
-  late Color firsteyeColor;
-  late TextEditingController secondeyecolorController;
-  late Color secondeyeColor;
-  late TextEditingController backgroundController;
-  late Color backgroundColor;
+int getColorValueFromHex(String hex) {
+  hex = hex.replaceAll('#', '');
+  return (int.parse('0xff' + hex));
+}
 
+class _SetColorContentState extends State<SetColorContent> {
   @override
   void initState() {
-    firstColor = mainColor;
-    secondColor = mainColor;
-    firstcolorController = TextEditingController();
-    secondcolorController = TextEditingController();
-    firsteyecolorController = TextEditingController();
-    secondeyecolorController = TextEditingController();
-    backgroundController = TextEditingController();
-    backgroundColor = Colors.white;
-    firsteyeColor = mainColor;
-    secondeyeColor = mainColor;
     String mainColorCode = "3A557E";
-    firstcolorController.text = mainColorCode;
-    secondcolorController.text = mainColorCode;
-    firsteyecolorController.text = mainColorCode;
-    secondeyecolorController.text = mainColorCode;
-    backgroundController.text = "FFFFFF";
-    isCustomEyeColor = false;
-    _radioCurrentValue = RadioButton.singleColor;
+    widget.firstcolorController.text = mainColorCode;
+    widget.secondcolorController.text = mainColorCode;
+    widget.firsteyecolorController.text = mainColorCode;
+    widget.secondeyecolorController.text = mainColorCode;
+    widget.backgroundController.text = "FFFFFF";
     super.initState();
   }
 
@@ -67,10 +73,10 @@ class _SetColorContentState extends State<SetColorContent> {
                     children: [
                       Radio<RadioButton>(
                         value: RadioButton.singleColor,
-                        groupValue: _radioCurrentValue,
+                        groupValue: widget.radioCurrentValue,
                         onChanged: (newValue) => setState(() {
-                          _radioCurrentValue = newValue!;
-                          currentGradient = null;
+                          widget.radioCurrentValue = newValue!;
+                          widget.currentGradient = null;
                         }),
                       ),
                       Text("Single color")
@@ -80,10 +86,11 @@ class _SetColorContentState extends State<SetColorContent> {
                     children: [
                       Radio<RadioButton>(
                           value: RadioButton.gradient,
-                          groupValue: _radioCurrentValue,
+                          groupValue: widget.radioCurrentValue,
                           onChanged: (newValue) => setState(() {
-                                _radioCurrentValue = newValue!;
-                                currentGradient = Gradient.LinearGradient;
+                                widget.radioCurrentValue = newValue!;
+                                widget.currentGradient =
+                                    Gradient.LinearGradient;
                               })),
                       Text("Color gradient")
                     ],
@@ -93,9 +100,9 @@ class _SetColorContentState extends State<SetColorContent> {
               Row(
                 children: [
                   Checkbox(
-                    value: isCustomEyeColor,
+                    value: widget.isCustomEyeColor,
                     onChanged: (newValue) => setState(() {
-                      isCustomEyeColor = newValue!;
+                      widget.isCustomEyeColor = newValue!;
                     }),
                   ),
                   Text("Custom Eye Color")
@@ -110,22 +117,26 @@ class _SetColorContentState extends State<SetColorContent> {
                 size.height * 0.3, mainColor.withAlpha(100)),
           ),
           Row(
-            mainAxisAlignment: _radioCurrentValue == RadioButton.gradient
+            mainAxisAlignment: widget.radioCurrentValue == RadioButton.gradient
                 ? MainAxisAlignment.spaceEvenly
                 : MainAxisAlignment.start,
             children: [
               ColorPickerWidget(
-                  onColorChanged: (color) => firstColor = color,
-                  pickerColor: firstColor,
-                  textController: firstcolorController),
-              if (_radioCurrentValue == RadioButton.gradient)
+                  onColorChanged: (color) => setState(() {
+                        widget.firstColor = color;
+                      }),
+                  pickerColor: widget.firstColor,
+                  textController: widget.firstcolorController),
+              if (widget.radioCurrentValue == RadioButton.gradient)
                 ColorPickerWidget(
-                    onColorChanged: (color) => secondColor = color,
-                    pickerColor: secondColor,
-                    textController: secondcolorController),
+                    onColorChanged: (color) => setState(() {
+                          widget.secondColor = color;
+                        }),
+                    pickerColor: widget.secondColor,
+                    textController: widget.secondcolorController),
             ],
           ),
-          if (_radioCurrentValue == RadioButton.gradient)
+          if (widget.radioCurrentValue == RadioButton.gradient)
             Center(
               child: SizedBox(
                   width: size.width * 0.6,
@@ -136,15 +147,16 @@ class _SetColorContentState extends State<SetColorContent> {
                         IconButton(
                             onPressed: () => setState(() {
                                   Color bufferColor;
-                                  bufferColor = firstColor;
-                                  firstColor = secondColor;
-                                  secondColor = bufferColor;
+                                  bufferColor = widget.firstColor;
+                                  widget.firstColor = widget.secondColor;
+                                  widget.secondColor = bufferColor;
                                   String bufferText;
 
-                                  bufferText = firstcolorController.text;
-                                  firstcolorController.text =
-                                      secondcolorController.text;
-                                  secondcolorController.text = bufferText;
+                                  bufferText = widget.firstcolorController.text;
+                                  widget.firstcolorController.text =
+                                      widget.secondcolorController.text;
+                                  widget.secondcolorController.text =
+                                      bufferText;
                                 }),
                             icon: const Icon(Icons.compare_arrows_rounded)),
                         DropdownButton<Gradient>(
@@ -159,37 +171,42 @@ class _SetColorContentState extends State<SetColorContent> {
                             )
                           ],
                           onChanged: (gradient) => setState(() {
-                            currentGradient = gradient;
+                            widget.currentGradient = gradient!;
+                            print(widget.currentGradient);
                           }),
-                          value: currentGradient,
+                          value: widget.currentGradient,
                         )
                       ],
                     ),
                   )),
             ),
-          if (isCustomEyeColor)
+          if (widget.isCustomEyeColor)
             Text(
               "Eye color",
               textAlign: TextAlign.left,
               style: customTextStyles.Titile1(
                   size.height * 0.3, mainColor.withAlpha(100)),
             ),
-          if (isCustomEyeColor)
+          if (widget.isCustomEyeColor)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ColorPickerWidget(
-                    onColorChanged: (color) => firsteyeColor = color,
-                    pickerColor: firsteyeColor,
-                    textController: firsteyecolorController),
-                if (isCustomEyeColor)
+                    onColorChanged: (color) => setState(() {
+                          widget.firsteyeColor = color;
+                        }),
+                    pickerColor: widget.firsteyeColor,
+                    textController: widget.firsteyecolorController),
+                if (widget.isCustomEyeColor)
                   ColorPickerWidget(
-                      onColorChanged: (color) => secondColor = color,
-                      pickerColor: secondeyeColor,
-                      textController: secondeyecolorController),
+                      onColorChanged: (color) => setState(() {
+                            widget.secondeyeColor = color;
+                          }),
+                      pickerColor: widget.secondeyeColor,
+                      textController: widget.secondeyecolorController),
               ],
             ),
-          if (isCustomEyeColor)
+          if (widget.isCustomEyeColor)
             Center(
                 child: SizedBox(
                     width: size.width * 0.6,
@@ -200,26 +217,29 @@ class _SetColorContentState extends State<SetColorContent> {
                             IconButton(
                                 onPressed: () => setState(() {
                                       Color bufferColor;
-                                      bufferColor = firsteyeColor;
-                                      firsteyeColor = secondeyeColor;
-                                      secondeyeColor = bufferColor;
+                                      bufferColor = widget.firsteyeColor;
+                                      widget.firsteyeColor =
+                                          widget.secondeyeColor;
+                                      widget.secondeyeColor = bufferColor;
                                       String bufferText;
 
-                                      bufferText = firsteyecolorController.text;
-                                      firsteyecolorController.text =
-                                          secondeyecolorController.text;
-                                      secondeyecolorController.text =
+                                      bufferText =
+                                          widget.firsteyecolorController.text;
+                                      widget.firsteyecolorController.text =
+                                          widget.secondeyecolorController.text;
+                                      widget.secondeyecolorController.text =
                                           bufferText;
                                     }),
                                 icon: const Icon(Icons.compare_arrows_rounded)),
                             TextButton(
                                 onPressed: () => setState(() {
-                                      firsteyeColor = firstColor;
-                                      firsteyecolorController =
-                                          firstcolorController;
-                                      secondeyeColor = secondColor;
-                                      secondeyecolorController.text =
-                                          secondcolorController.text;
+                                      widget.firsteyeColor = widget.firstColor;
+                                      widget.firsteyecolorController =
+                                          widget.firstcolorController;
+                                      widget.secondeyeColor =
+                                          widget.secondColor;
+                                      widget.secondeyecolorController.text =
+                                          widget.secondcolorController.text;
                                     }),
                                 child: Text("Copy foreground"))
                           ],
@@ -231,9 +251,11 @@ class _SetColorContentState extends State<SetColorContent> {
                 size.height * 0.3, mainColor.withAlpha(100)),
           ),
           ColorPickerWidget(
-              onColorChanged: (color) => backgroundColor = color,
-              pickerColor: backgroundColor,
-              textController: backgroundController),
+              onColorChanged: (color) => setState(() {
+                    widget.backgroundColor = color;
+                  }),
+              pickerColor: widget.backgroundColor,
+              textController: widget.backgroundController),
         ],
       ),
     );

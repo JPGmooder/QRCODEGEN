@@ -92,14 +92,20 @@ void Function() showColorPicker(
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: CupertinoTextField(
+                  enabled: false,
                   controller: textController,
                   prefix: const Padding(
                       padding: EdgeInsets.only(left: 8),
                       child: Icon(Icons.tag)),
-                  suffix: IconButton(
-                      icon: const Icon(Icons.content_paste_rounded),
-                      onPressed: () => Clipboard.setData(
-                          ClipboardData(text: textController.text))),
+                  suffix: Row(
+                    children: [
+                      IconButton(
+                          icon: const Icon(Icons.content_paste_rounded),
+                          onPressed: () => Clipboard.setData(
+                              ClipboardData(text: textController.text))),
+                              
+                    ],
+                  ),
                   autofocus: false,
                   maxLength: 9,
                   inputFormatters: [
