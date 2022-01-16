@@ -1,15 +1,8 @@
 abstract class MainQrState {}
 
-class MainQrInitialState  extends MainQrState
-{
+class MainQrInitialState extends MainQrState {}
 
-}
-
-class MainQrLoadingState  extends MainQrState
-{
-
-}
-
+class MainQrLoadingState extends MainQrState {}
 
 class QrSavedState extends MainQrState {
   String downloadUrl;
@@ -21,7 +14,10 @@ class QrListLoadedState extends MainQrState {
   QrListLoadedState(this.downloadUrls);
 }
 
-class QrDeletedState extends MainQrState {}
+class QrDeletedState extends MainQrState {
+  String deletedUrl;
+  QrDeletedState(this.deletedUrl);
+}
 
 class QrErroredState extends MainQrState {
   Error error;

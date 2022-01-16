@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trionproj/consts/strings.dart';
@@ -30,6 +31,9 @@ void main() async {
       spKeyOfUsersPassword: sharedprefs.getString(spKeyOfUsersPassword)!,
     };
   }
+
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   runApp(MyApp(
     typeOfAuth: typeOfAuth,
     usersCredentials: usersCredentials,
@@ -48,8 +52,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (ctx) => AuthorizationBloc()),
         BlocProvider<QrImagesCubit>(create: (ctx) => QrImagesCubit()),
         BlocProvider<QrCodeCreatorCubit>(create: (ctx) => QrCodeCreatorCubit()),
-                BlocProvider<MainQrBloc>(create: (ctx) => MainQrBloc())
-
+        BlocProvider<MainQrBloc>(create: (ctx) => MainQrBloc())
       ],
       child: MaterialApp(
           title: 'Material App',
@@ -59,14 +62,25 @@ class MyApp extends StatelessWidget {
                   typeOfAuth: typeOfAuth,
                   usersCredentials: usersCredentials,
                 ),
-          routes: {
-            authorizationScreenRoute: (ctx) => BlocProvider.value(
-                  value: BlocProvider.of<AuthorizationBloc>(ctx),
-                  child: AuthorizationScreen(),
-                ),
-            QRMainList: (ctx) => QrMainList(),
-            "qrtest": (ctx) => SingleQrCodeScreen()
-          }),
+          onGenerateRoute: (settings) {
+            if (settings.name == QRMainList) {
+              return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (_, __, ___) => QrMainList(),
+                  transitionsBuilder: (_, a, __, c) =>
+                      FadeTransition(opacity: a, child: c));
+            } else if (settings.name == authorizationScreenRoute) {
+              return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (ctx, __, ___) => BlocProvider.value(
+                        value: BlocProvider.of<AuthorizationBloc>(ctx),
+                        child: AuthorizationScreen(),
+                      ),
+                  transitionsBuilder: (_, a, __, c) =>
+                      FadeTransition(opacity: a, child: c));
+            }
+          },
+          routes: {"qrtest": (ctx) => SingleQrCodeScreen()}),
     );
   }
 
@@ -101,7 +115,9 @@ class _AuthRouterState extends State<AuthRouter> {
       if (event is AuthorizationLogedIn) {
         Navigator.of(context).pushReplacementNamed(QRMainList);
       } else if (event is AuthorizationErrored) {
-        Navigator.of(context).pushReplacementNamed(authorizationScreenRoute);
+        Navigator.of(context).pushReplacementNamed(
+          authorizationScreenRoute,
+        );
       }
     });
 

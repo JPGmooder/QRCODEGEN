@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:trionproj/consts/colors.dart';
+import 'package:trionproj/logic/qr_bloc/main_qr_bloc.dart';
+import 'package:trionproj/logic/qr_bloc/main_qr_events.dart';
 import 'package:trionproj/models/textstyles.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class QrCodeWidget extends StatelessWidget {
-   QrCodeWidget({Key? key, required this.urlToImage}) : super(key: key);
+  QrCodeWidget({Key? key, required this.urlToImage}) : super(key: key);
   String urlToImage;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Card(
       child: Dismissible(
-        key: key!,
+        onDismissed: (_) {
+          context.read<MainQrBloc>().add(DeleteQrCode(urlToImage));
+        },
+        key: ValueKey(urlToImage),
         direction: DismissDirection.endToStart,
         background: Container(
           color: Colors.red[300],
@@ -25,10 +31,14 @@ class QrCodeWidget extends StatelessWidget {
               Navigator.of(context).pushNamed("qrtest", arguments: urlToImage);
             },
             leading: SizedBox(
-              height: size.height * 0.2,
+              height: size.width * 0.2,
+              width: size.width * 0.2,
               child: Hero(
                 tag: urlToImage,
-                child: Image.network(urlToImage),
+                child: Image.network(
+                  urlToImage,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             title: Text(

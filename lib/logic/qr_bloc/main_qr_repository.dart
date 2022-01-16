@@ -32,12 +32,24 @@ class MainQrRepository {
     return dowloadUrl;
   }
 
+  static Future<void> DeleteQrCode(String imagePath) async {
+    var allQrs = await MainQrProvider.LoadQrCodes();
+    for (var qr in allQrs.items) {
+      var firebaseImagePath = await qr.getDownloadURL();
+      if (imagePath == firebaseImagePath) {
+        await qr.delete();
+        break;
+      }
+    }
+  }
+
   static Future<List<String>> loadQrCodes() async {
     bool isInitial = false;
     var rawData = await MainQrProvider.LoadQrCodes();
     List<String> urlList = [];
     for (var item in rawData.items) {
-      urlList.add(await item.getDownloadURL());
+      var loadedurl = await item.getDownloadURL();
+      urlList.add(loadedurl);
     }
     return urlList;
   }

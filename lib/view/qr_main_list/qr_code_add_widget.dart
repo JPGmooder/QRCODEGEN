@@ -64,33 +64,33 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
   void setIsCustomEyeColor(bool state) => isCustomEyeColor = state;
 
   Color firstColor = mainColor;
-  void setfirstColor(Color state) => this.firstColor = state;
+  void setfirstColor(Color state) => firstColor = state;
 
   Color secondColor = mainColor;
-  void setsecondColor(Color state) => this.secondColor = state;
+  void setsecondColor(Color state) => secondColor = state;
 
   Color firsteyeColor = mainColor;
-  void setfirsteyeColor(Color state) => this.firsteyeColor = state;
+  void setfirsteyeColor(Color state) => firsteyeColor = state;
 
   Color secondeyeColor = mainColor;
-  void setsecondeyeColor(Color state) => this.secondeyeColor = state;
+  void setsecondeyeColor(Color state) => secondeyeColor = state;
 
   Color backgroundColor = Colors.white;
-  void setbackgroundColor(Color state) => this.backgroundColor = state;
+  void setbackgroundColor(Color state) => backgroundColor = state;
 
   String pickedImage = "";
 
-  void setPickedImage(String path) => this.pickedImage = path;
+  void setPickedImage(String path) => pickedImage = path;
 
   String pickedEye = "";
 
-  void setPickedEye(String path) => this.pickedEye = path;
+  void setPickedEye(String path) => pickedEye = path;
 
   String pickedEyeBallShape = "";
-  void setpickedEyeBallShape(String path) => this.pickedEyeBallShape = path;
+  void setpickedEyeBallShape(String path) => pickedEyeBallShape = path;
 
   String pickedShape = "";
-  void setpickedShape(String path) => this.pickedShape = path;
+  void setpickedShape(String path) => pickedShape = path;
 
   @override
   Widget build(BuildContext context) {
@@ -310,8 +310,8 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
                                                       gradientColor2: currentGradient == null ? "" : "#" + secondcolorController.text,
                                                       gradientType: currentGradient == null ? "" : currentGradient!.name.split("G").first.toLowerCase(),
                                                       gradientOnEyes: false,
-                                                      logo: pickedImage.isEmpty ? "" : pickedImage)),
-                                              child: Text("Go gen"))
+                                                      logo: pickedImage == "" ? "https://firebasestorage.googleapis.com/v0/b/trionproj.appspot.com/o/initial_logos%2Fic_twitter_rounded.jpg?alt=media&token=48c60004-e7ea-400e-b731-20d36ac3fcae" : pickedImage)),
+                                              child: Text("Create QrCode"))
                                         ],
                                       ),
                                     );
@@ -319,10 +319,10 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
                                     return CircularProgressIndicator.adaptive();
                                   } else if (state is QrCodeCreatorCreated) {
                                     return Column(children: [
-                                      Image.network(state.imagePath),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                      state.imagePath.startsWith("http")
+                                          ? Image.network(state.imagePath)
+                                          : Image.file(File(state.imagePath)),
+                                      Column(
                                         children: [
                                           ElevatedButton(
                                               style: ElevatedButton.styleFrom(
@@ -338,10 +338,16 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
                                           ElevatedButton(
                                               style: ElevatedButton.styleFrom(
                                                   primary: Colors.green[200]),
-                                              onPressed: () => context
-                                                  .read<MainQrBloc>()
-                                                  .add(SaveQrCode(
-                                                      this.pickedImage)),
+                                              onPressed: () {
+                                                context.read<MainQrBloc>().add(
+                                                    SaveQrCode(
+                                                        this.pickedImage));
+                                                Navigator.of(context).pop();
+                                                context
+                                                    .read<QrCodeCreatorCubit>()
+                                                    .emit(
+                                                        QrCodeCreatorInitial());
+                                              },
                                               child: Text("Save Qr code"))
                                         ],
                                       )
@@ -351,7 +357,7 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
                                 },
                               ),
                       )),
-              child: Text("Abreba"))
+              child: Text("Create QrCode!"))
         ],
       ),
     );
@@ -374,13 +380,18 @@ class _ColoredText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Row(
       children: [
-        Text(title),
+        Text(
+          title,
+          style: TextStyle(fontSize: size.width * 0.04),
+        ),
         Text(
           color == Colors.white || controllerText == "FFFFFF"
               ? "White"
               : "#" + controllerText,
+          softWrap: true,
           style: TextStyle(
               color: color == Colors.white || controllerText == "FFFFFF"
                   ? Colors.black

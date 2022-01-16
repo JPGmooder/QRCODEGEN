@@ -9,7 +9,8 @@ class QrCodeCreatorCubit extends Cubit<QrCodeCreatorState> {
   Future<void> generateQrCode(QrCodeConfigModel qrCodeModel) async {
     emit(QrCodeLoadingState());
     (await QrCodeCreatorProvider.getRawData(qrCodeModel.toJson()));
-    emit(QrCodeCreatorCreated(
-        "https://cdn.zephyrcms.com/2b5fcc68-f3d1-4c94-8e58-2fd5ee03a75c/-/progressive/yes/qr-code-contact-us"));
+    emit(QrCodeCreatorCreated(qrCodeModel.logo.isEmpty
+        ? "https://firebasestorage.googleapis.com/v0/b/trionproj.appspot.com/o/initial_logos%2Fic_twitter_rounded.jpg?alt=media&token=48c60004-e7ea-400e-b731-20d36ac3fcae"
+        : qrCodeModel.logo));
   }
 }

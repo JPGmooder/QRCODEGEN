@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trionproj/consts/colors.dart';
 import 'package:trionproj/consts/strings.dart';
@@ -10,6 +13,8 @@ import 'package:trionproj/logic/qr_bloc/main_qr_bloc.dart';
 import 'package:trionproj/logic/qr_bloc/main_qr_events.dart';
 import 'package:trionproj/logic/qr_bloc/main_qr_states.dart';
 import 'package:trionproj/logic/shared_preferences.dart';
+import 'package:trionproj/main.dart';
+import 'package:trionproj/models/textstyles.dart';
 import 'package:trionproj/view/qr_main_list/qr_code_add_widget.dart';
 import 'package:trionproj/view/qr_main_list/qr_code_widget.dart';
 
@@ -33,7 +38,7 @@ class QrMainList extends StatelessWidget {
                       );
                 isMaterialBannerOpened = !isMaterialBannerOpened;
               },
-              child: Icon(Icons.add)),
+              child: Icon(Icons.ad_units)),
         ),
         backgroundColor: mainColor,
         appBar: AppBar(
@@ -59,36 +64,58 @@ class QrMainList extends StatelessWidget {
 }
 
 class MainListBody extends StatefulWidget {
-  const MainListBody({
+  MainListBody({
     Key? key,
   }) : super(key: key);
-
+  List<String> qrCodes = [];
   @override
   State<MainListBody> createState() => _MainListBodyState();
 }
 
 class _MainListBodyState extends State<MainListBody> {
+  late StreamSubscription sub;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     context.read<MainQrBloc>().add(LoadQrCodes());
+
+    sub = BlocProvider.of<MainQrBloc>(context).stream.listen((state) {
+      if (state is QrListLoadedState) {
+        setState(() {
+          widget.qrCodes = state.downloadUrls;
+        });
+      } else if (state is QrDeletedState) {
+        setState(() {
+          widget.qrCodes.remove(state.deletedUrl);
+        });
+      } else if (state is QrSavedState) {
+        setState(() {
+          widget.qrCodes.add(state.downloadUrl);
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    sub.cancel();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MainQrBloc, MainQrState>(
-      builder: (context, state) {
-        if (state is QrListLoadedState) if (state.downloadUrls.length > 0)
-          return ListView.builder(
-              itemBuilder: (ctx, index) => QrCodeWidget(
-                    urlToImage: state.downloadUrls[index],
-                  ));
-        else
-          return Text("You have no QR Codes");
-        else
-          return Container();
-      },
-    );
+    return widget.qrCodes.isEmpty
+        ? Center(
+            child: Text("No QR Codes found :(",
+                style: customTextStyles.Titile1(
+                  MediaQuery.of(context).size.width,
+                  mainColor.withAlpha(250),
+                )))
+        : ListView.builder(
+            itemCount: widget.qrCodes.length,
+            itemBuilder: (ctx, index) =>
+                QrCodeWidget(urlToImage: widget.qrCodes[index]));
   }
 }

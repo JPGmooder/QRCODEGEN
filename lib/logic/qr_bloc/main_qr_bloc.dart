@@ -16,6 +16,15 @@ class MainQrBloc extends Bloc<MainQrEvent, MainQrState> {
       }
     });
 
+    on<DeleteQrCode>((event, emit) async {
+      try {
+        await MainQrRepository.DeleteQrCode(event.linkToCode);
+        emit(QrDeletedState(event.linkToCode));
+      } catch (e) {
+        emit(QrErroredState(e as Error));
+      }
+    });
+
     on<LoadQrCodes>((event, emit) async {
       try {
         emit(MainQrLoadingState());

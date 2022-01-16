@@ -15,8 +15,9 @@ class MainQrProvider {
     return fileName;
   }
 
+
   static Future<ListResult> LoadQrCodes() async =>
       await FirebaseStorage.instance
-          .ref("Users/${FirebaseAuth.instance.currentUser!.uid}/initial_logos")
+          .ref("Users/${FirebaseAuth.instance.currentUser!.uid}")
           .listAll();
 }
