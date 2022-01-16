@@ -193,6 +193,9 @@ class _AuthorizationScreenState extends State<AuthorizationScreen>
                                   context: context,
                                   builder: (ctx) => AlertDialog(
                                       content: Text(state.error.toString())));
+                            } else if (state is AuthorizationLogedIn) {
+                              Navigator.of(context)
+                                  .pushReplacementNamed(QRMainList);
                             }
                           },
                           builder: (context, state) {

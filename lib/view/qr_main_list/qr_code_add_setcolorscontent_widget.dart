@@ -29,15 +29,15 @@ class SetColorContent extends StatefulWidget {
   void Function(bool) isCustomEyeColorCallBack;
 
   TextEditingController firstcolorController;
-  Color firstColor;
+  void Function(Color) firstColor;
   TextEditingController secondcolorController;
-  Color secondColor;
+  void Function(Color) secondColor;
   TextEditingController firsteyecolorController;
-  Color firsteyeColor;
+  void Function(Color) firsteyeColor;
   TextEditingController secondeyecolorController;
-  Color secondeyeColor;
+  void Function(Color) secondeyeColor;
   TextEditingController backgroundController;
-  Color backgroundColor;
+  void Function(Color) backgroundColor;
   @override
   _SetColorContentState createState() => _SetColorContentState();
 }
@@ -48,12 +48,23 @@ int getColorValueFromHex(String hex) {
 }
 
 class _SetColorContentState extends State<SetColorContent> {
+  late Color _fc;
+  late Color _sc;
+  late Color _fec;
+  late Color _sec;
+  late Color _bc;
   late RadioButton radCurent;
   Gradient? currentGradient;
   late bool isCustomEyeColor;
   @override
   void initState() {
     isCustomEyeColor = false;
+    _fc = mainColor;
+    _sc = mainColor;
+    _fec = mainColor;
+    _sec = mainColor;
+    _bc = Colors.white;
+
     radCurent = RadioButton.singleColor;
     String mainColorCode = "3A557E";
     widget.firstcolorController.text = mainColorCode;
@@ -132,16 +143,18 @@ class _SetColorContentState extends State<SetColorContent> {
             children: [
               ColorPickerWidget(
                   onColorChanged: (color) => setState(() {
-                        widget.firstColor = color;
+                        _fc = color;
+                        widget.firstColor(_fc);
                       }),
-                  pickerColor: widget.firstColor,
+                  pickerColor: _fc,
                   textController: widget.firstcolorController),
               if (radCurent == RadioButton.gradient)
                 ColorPickerWidget(
                     onColorChanged: (color) => setState(() {
-                          widget.secondColor = color;
+                          _sc = color;
+                          widget.secondColor(_sc);
                         }),
-                    pickerColor: widget.secondColor,
+                    pickerColor: _sc,
                     textController: widget.secondcolorController),
             ],
           ),
@@ -156,9 +169,9 @@ class _SetColorContentState extends State<SetColorContent> {
                         IconButton(
                             onPressed: () => setState(() {
                                   Color bufferColor;
-                                  bufferColor = widget.firstColor;
-                                  widget.firstColor = widget.secondColor;
-                                  widget.secondColor = bufferColor;
+                                  bufferColor = _sc;
+                                  _fc = _sc;
+                                  _sc = bufferColor;
                                   String bufferText;
 
                                   bufferText = widget.firstcolorController.text;
@@ -202,16 +215,18 @@ class _SetColorContentState extends State<SetColorContent> {
               children: [
                 ColorPickerWidget(
                     onColorChanged: (color) => setState(() {
-                          widget.firsteyeColor = color;
+                          _fec = color;
+                          widget.firsteyeColor(_fec);
                         }),
-                    pickerColor: widget.firsteyeColor,
+                    pickerColor: _fec,
                     textController: widget.firsteyecolorController),
                 if (isCustomEyeColor)
                   ColorPickerWidget(
                       onColorChanged: (color) => setState(() {
-                            widget.secondeyeColor = color;
+                            _sec = color;
+                            widget.secondeyeColor(_sec);
                           }),
-                      pickerColor: widget.secondeyeColor,
+                      pickerColor: _sec,
                       textController: widget.secondeyecolorController),
               ],
             ),
@@ -226,10 +241,9 @@ class _SetColorContentState extends State<SetColorContent> {
                             IconButton(
                                 onPressed: () => setState(() {
                                       Color bufferColor;
-                                      bufferColor = widget.firsteyeColor;
-                                      widget.firsteyeColor =
-                                          widget.secondeyeColor;
-                                      widget.secondeyeColor = bufferColor;
+                                      bufferColor = _fec;
+                                      _fec = _sec;
+                                      _sec = bufferColor;
                                       String bufferText;
 
                                       bufferText =
@@ -242,11 +256,10 @@ class _SetColorContentState extends State<SetColorContent> {
                                 icon: const Icon(Icons.compare_arrows_rounded)),
                             TextButton(
                                 onPressed: () => setState(() {
-                                      widget.firsteyeColor = widget.firstColor;
-                                      widget.firsteyecolorController =
-                                          widget.firstcolorController;
-                                      widget.secondeyeColor =
-                                          widget.secondColor;
+                                      _fec = _fc;
+                                      widget.firsteyecolorController.text =
+                                          widget.firstcolorController.text;
+                                      _sec = _sc;
                                       widget.secondeyecolorController.text =
                                           widget.secondcolorController.text;
                                     }),
@@ -261,9 +274,10 @@ class _SetColorContentState extends State<SetColorContent> {
           ),
           ColorPickerWidget(
               onColorChanged: (color) => setState(() {
-                    widget.backgroundColor = color;
+                    _bc = color;
+                    widget.backgroundColor(_bc);
                   }),
-              pickerColor: widget.backgroundColor,
+              pickerColor: _bc,
               textController: widget.backgroundController),
         ],
       ),

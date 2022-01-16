@@ -29,15 +29,20 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     });
 
     on<Auth_SignUpViaFirebase>((event, emit) async {
-      emit(AuthorizationLoadingState());
+      try {
+        emit(AuthorizationLoadingState());
 
-      await AuthorizationRepository.signUpViaFirebase(
-          event.login, event.password);
+        await AuthorizationRepository.signUpViaFirebase(
+            event.login, event.password);
 
-      await SharedPreferencesLib.loginUser(false,
-          login: event.login, passwrod: event.password);
+        await SharedPreferencesLib.loginUser(false,
+            login: event.login, passwrod: event.password);
 
-      emit(AuthorizationLogedIn(false));
+        emit(AuthorizationLogedIn(false));
+      } catch (e) {
+        emit(AuthorizationErrored(
+            AuthentificationError((e as FirebaseAuthException).message!)));
+      }
     });
   }
 

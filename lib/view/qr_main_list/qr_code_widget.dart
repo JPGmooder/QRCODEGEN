@@ -3,8 +3,8 @@ import 'package:trionproj/consts/colors.dart';
 import 'package:trionproj/models/textstyles.dart';
 
 class QrCodeWidget extends StatelessWidget {
-  const QrCodeWidget({Key? key}) : super(key: key);
-
+   QrCodeWidget({Key? key, required this.urlToImage}) : super(key: key);
+  String urlToImage;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -22,14 +22,13 @@ class QrCodeWidget extends StatelessWidget {
         child: ListTile(
             onTap: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-              Navigator.of(context).pushNamed("qrtest");
+              Navigator.of(context).pushNamed("qrtest", arguments: urlToImage);
             },
             leading: SizedBox(
               height: size.height * 0.2,
               child: Hero(
-                tag: 1,
-                child: Image.network(
-                    'https://pngimg.com/uploads/qr_code/qr_code_PNG6.png'),
+                tag: urlToImage,
+                child: Image.network(urlToImage),
               ),
             ),
             title: Text(

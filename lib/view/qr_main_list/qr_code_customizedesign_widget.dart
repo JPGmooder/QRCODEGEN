@@ -32,7 +32,8 @@ class CustomeDesignWidget extends StatelessWidget {
           callback: pickEyeBallCallback,
           pickerTitle: Text("Eye ball shape: "),
           providedShapes: assetEyeBallShapes,
-        )
+        ),
+        
       ],
     );
   }

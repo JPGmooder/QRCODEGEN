@@ -9,6 +9,8 @@ import 'package:trionproj/consts/strings.dart';
 import 'package:trionproj/logic/authorization_bloc/authorization_bloc.dart';
 import 'package:trionproj/logic/authorization_bloc/authorization_states.dart';
 import 'package:trionproj/logic/internet_connection_cubit.dart';
+import 'package:trionproj/logic/qr_bloc/main_qr_bloc.dart';
+import 'package:trionproj/logic/qr_code_creator_cubit/qr_code_creator_cubit.dart';
 import 'package:trionproj/logic/qr_images_cubit/qr_images_cubit.dart';
 import 'package:trionproj/view/authorization_screen/authorization_screen.dart';
 import 'package:trionproj/view/onboarding_screen/onboarding.dart';
@@ -20,9 +22,7 @@ void main() async {
   await Firebase.initializeApp();
 
   var sharedprefs = await SharedPreferences.getInstance();
-
   var typeOfAuth = sharedprefs.getString(spKeyTypeOfAuth);
-  print(typeOfAuth);
   Map<String, String>? usersCredentials;
   if (typeOfAuth == spAuthTypeFirebase) {
     usersCredentials = {
@@ -43,26 +43,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (ctx) => AuthorizationBloc(),
-        child: MaterialApp(
-            title: 'Material App',
-            home: BlocProvider<QrImagesCubit>(
-                create: (ctx) => QrImagesCubit(), child: QrMainList()),
-            // typeOfAuth == null
-            //     ? OnBoardingScreen()
-            //     : AuthRouter(
-            //         typeOfAuth: typeOfAuth,
-            //         usersCredentials: usersCredentials,
-            //       ),
-            routes: {
-              authorizationScreenRoute: (ctx) => BlocProvider.value(
-                    value: BlocProvider.of<AuthorizationBloc>(ctx),
-                    child: AuthorizationScreen(),
-                  ),
-              QRMainList: (ctx) => QrMainList(),
-              "qrtest": (ctx) => SingleQrCodeScreen()
-            }));
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (ctx) => AuthorizationBloc()),
+        BlocProvider<QrImagesCubit>(create: (ctx) => QrImagesCubit()),
+        BlocProvider<QrCodeCreatorCubit>(create: (ctx) => QrCodeCreatorCubit()),
+                BlocProvider<MainQrBloc>(create: (ctx) => MainQrBloc())
+
+      ],
+      child: MaterialApp(
+          title: 'Material App',
+          home: typeOfAuth == null
+              ? OnBoardingScreen()
+              : AuthRouter(
+                  typeOfAuth: typeOfAuth,
+                  usersCredentials: usersCredentials,
+                ),
+          routes: {
+            authorizationScreenRoute: (ctx) => BlocProvider.value(
+                  value: BlocProvider.of<AuthorizationBloc>(ctx),
+                  child: AuthorizationScreen(),
+                ),
+            QRMainList: (ctx) => QrMainList(),
+            "qrtest": (ctx) => SingleQrCodeScreen()
+          }),
+    );
   }
 
   // Widget setInternetListener(Widget child) {
