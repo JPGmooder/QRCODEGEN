@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trionproj/consts/colors.dart';
 import 'package:trionproj/logic/qr_bloc/main_qr_bloc.dart';
-import 'package:trionproj/logic/qr_bloc/main_qr_events.dart';
 import 'package:trionproj/models/textstyles.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,7 +13,9 @@ class QrCodeWidget extends StatelessWidget {
     return Card(
       child: Dismissible(
         onDismissed: (_) {
-          context.read<MainQrBloc>().add(DeleteQrCode(urlToImage));
+          context
+              .read<MainQrBloc>()
+              .add(MainQrEvent.delete(linkToCode: urlToImage));
         },
         key: ValueKey(urlToImage),
         direction: DismissDirection.endToStart,

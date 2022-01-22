@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:trionproj/logic/qr_images_cubit/qr_images_cubit.dart';
-import 'package:trionproj/logic/qr_images_cubit/qr_images_states.dart';
 
 class AddLogoImageWidget extends StatefulWidget {
   AddLogoImageWidget({Key? key, required this.pathCallBack}) : super(key: key);
@@ -81,23 +81,24 @@ class _AddLogoImageWidgetState extends State<AddLogoImageWidget> {
           height: size.height * 0.1,
           child: BlocBuilder<QrImagesCubit, QrImageState>(
             builder: (context, state) {
-              return state is QrImagesLoadedState
-                  ? ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: state.downloadList
-                          .map((e) => GestureDetector(
-                                onTap: () => setState(() {
-                                  pickedImage = Image.network(e);
-                                  widget.pathCallBack(e);
-                                }),
-                                child: Image.network(
-                                  e,
-                                  width: size.width * 0.2,
-                                ),
-                              ))
-                          .toList(),
-                    )
-                  : CircularProgressIndicator.adaptive();
+              return state.maybeWhen(
+                orElse: () => CircularProgressIndicator.adaptive(),
+                loaded: (list) => ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: list
+                      .map((e) => GestureDetector(
+                            onTap: () => setState(() {
+                              pickedImage = Image.network(e);
+                              widget.pathCallBack(e);
+                            }),
+                            child: CachedNetworkImage(
+                              imageUrl: e,
+                              width: size.width * 0.2,
+                            ),
+                          ))
+                      .toList(),
+                ),
+              );
             },
           ),
         )

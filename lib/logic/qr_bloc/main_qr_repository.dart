@@ -1,11 +1,4 @@
-import 'dart:io';
-
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
-import 'package:trionproj/logic/qr_bloc/main_qr_provider.dart';
-import 'package:trionproj/logic/qr_code_creator_cubit/qr_code_creqtor_provider.dart';
-import 'package:trionproj/view/qr_main_list/qr_main_list.dart';
+part of "main_qr_bloc.dart";
 
 class MainQrRepository {
   static Future<String> saveNewQrCode(String linkQrCode) async {

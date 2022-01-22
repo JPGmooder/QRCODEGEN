@@ -6,8 +6,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:trionproj/consts/colors.dart';
 import 'package:trionproj/consts/strings.dart';
 import 'package:trionproj/logic/authorization_bloc/authorization_bloc.dart';
-import 'package:trionproj/logic/authorization_bloc/authorization_events.dart';
-import 'package:trionproj/logic/authorization_bloc/authorization_states.dart';
+
 import 'package:trionproj/models/textstyles.dart';
 import 'package:trionproj/view/standalone_widgets/connect_via_google_btn.dart';
 import 'package:trionproj/view/standalone_widgets/onBoardingButton.dart';
@@ -188,20 +187,19 @@ class _AuthorizationScreenState extends State<AuthorizationScreen>
                         child:
                             BlocConsumer<AuthorizationBloc, AuthorizationState>(
                           listener: (ctx, state) {
-                            if (state is AuthorizationErrored) {
-                              showDialog(
-                                  context: context,
-                                  builder: (ctx) => AlertDialog(
-                                      content: Text(state.error.toString())));
-                            } else if (state is AuthorizationLogedIn) {
-                              Navigator.of(context)
-                                  .pushReplacementNamed(QRMainList);
-                            }
+                            state.whenOrNull(
+                                logedIn: (_) => Navigator.of(context)
+                                    .pushReplacementNamed(QRMainList),
+                                errored: (error) => showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                        content: Text(error.toString()))));
                           },
                           builder: (context, state) {
-                            return state is AuthorizationLoadingState
-                                ? const CircularProgressIndicator.adaptive()
-                                : onBoardingMainButton(
+                            return state.maybeWhen(
+                                loading: () =>
+                                    const CircularProgressIndicator.adaptive(),
+                                orElse: () => onBoardingMainButton(
                                     onPress: goesToApp,
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
@@ -224,7 +222,7 @@ class _AuthorizationScreenState extends State<AuthorizationScreen>
                                           )
                                         ],
                                       ),
-                                    ));
+                                    )));
                           },
                         ),
                       ),

@@ -1,12 +1,11 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter/material.dart';
 import 'package:trionproj/consts/colors.dart';
 import 'package:trionproj/logic/qr_bloc/main_qr_bloc.dart';
-import 'package:trionproj/logic/qr_bloc/main_qr_events.dart';
 import 'package:trionproj/logic/qr_code_creator_cubit/qr_code_creator_cubit.dart';
-import 'package:trionproj/logic/qr_code_creator_cubit/qr_code_creator_states.dart';
 import 'package:trionproj/models/qr_code_model.dart';
 import 'package:trionproj/models/textstyles.dart';
 import 'package:trionproj/view/qr_main_list/qr_code_add_entercontent_widget.dart';
@@ -79,11 +78,9 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
   void setbackgroundColor(Color state) => backgroundColor = state;
 
   String pickedImage = "";
-
   void setPickedImage(String path) => pickedImage = path;
 
   String pickedEye = "";
-
   void setPickedEye(String path) => pickedEye = path;
 
   String pickedEyeBallShape = "";
@@ -158,120 +155,170 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
                             ? Text(
                                 'Url must be provided in "ENTER CONTENT" section')
                             : BlocBuilder<QrCodeCreatorCubit,
-                                QrCodeCreatorState>(
-                                builder: (ctx, state) {
-                                  if (state is QrCodeCreatorInitial) {
-                                    return SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                              "You are going to create a QR code with the following parameters:"),
-                                          Text(
-                                              "Content URL : ${linkController.text}"),
-                                          Text(
-                                              "Color type: ${radioCurrentValue.name}"),
-                                          if (radioCurrentValue ==
-                                              setcolor.RadioButton.singleColor)
-                                            _ColoredText(
-                                              color: firstColor,
-                                              controllerText:
-                                                  firstcolorController.text,
-                                              title: "Main foreground color: ",
-                                            ),
-                                          if (radioCurrentValue ==
-                                              setcolor.RadioButton.gradient)
-                                            Text(
-                                                "Gradient type: ${currentGradient!.name} "),
-                                          if (radioCurrentValue ==
-                                              setcolor.RadioButton.gradient)
-                                            _ColoredText(
-                                              color: firstColor,
-                                              controllerText:
-                                                  firstcolorController.text,
-                                              title: "Start foreground color: ",
-                                            ),
-                                          if (radioCurrentValue ==
-                                              setcolor.RadioButton.gradient)
-                                            _ColoredText(
-                                              color: secondColor,
-                                              controllerText:
-                                                  secondcolorController.text,
-                                              title: "End foreground color: ",
-                                            ),
-                                          if (isCustomEyeColor)
-                                            _ColoredText(
-                                              color: firsteyeColor,
-                                              controllerText:
-                                                  firsteyecolorController.text,
-                                              title: "First eye color: ",
-                                            ),
-                                          if (isCustomEyeColor)
-                                            _ColoredText(
-                                              color: secondeyeColor,
-                                              controllerText:
-                                                  secondeyecolorController.text,
-                                              title: "Second eye color: ",
-                                            ),
-                                          _ColoredText(
-                                            color:
-                                                backgroundColor == Colors.white
+                                    QrCodeCreatorState>(
+                                builder: (ctx, state) => state.maybeMap(
+                                    orElse: () => Container(),
+                                    loading: (_) =>
+                                        CircularProgressIndicator.adaptive(),
+                                    created: (state) => Column(children: [
+                                          state.imagePath.startsWith("http")
+                                              ? CachedNetworkImage(
+                                                  imageUrl: state.imagePath)
+                                              : Image.file(
+                                                  File(state.imagePath)),
+                                          Column(children: [
+                                            ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: Colors.red[200]),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  context
+                                                      .read<
+                                                          QrCodeCreatorCubit>()
+                                                      .emit(
+                                                          const QrCodeCreatorState
+                                                              .initial());
+                                                },
+                                                child: Text("Discard code")),
+                                            ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: Colors.green[200]),
+                                                onPressed: () {
+                                                  context
+                                                      .read<MainQrBloc>()
+                                                      .add(MainQrEvent.save(
+                                                          linkToCode:
+                                                              pickedImage));
+                                                  Navigator.of(context).pop();
+                                                  context
+                                                      .read<
+                                                          QrCodeCreatorCubit>()
+                                                      .emit(QrCodeCreatorState
+                                                          .initial());
+                                                },
+                                                child: Text("Save Qr code"))
+                                          ])
+                                        ]),
+                                    initial: (_) => SingleChildScrollView(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  "You are going to create a QR code with the following parameters:"),
+                                              Text(
+                                                  "Content URL : ${linkController.text}"),
+                                              Text(
+                                                  "Color type: ${radioCurrentValue.name}"),
+                                              if (radioCurrentValue ==
+                                                  setcolor
+                                                      .RadioButton.singleColor)
+                                                _ColoredText(
+                                                  color: firstColor,
+                                                  controllerText:
+                                                      firstcolorController.text,
+                                                  title:
+                                                      "Main foreground color: ",
+                                                ),
+                                              if (radioCurrentValue ==
+                                                  setcolor.RadioButton.gradient)
+                                                Text(
+                                                    "Gradient type: ${currentGradient!.name} "),
+                                              if (radioCurrentValue ==
+                                                  setcolor.RadioButton.gradient)
+                                                _ColoredText(
+                                                  color: firstColor,
+                                                  controllerText:
+                                                      firstcolorController.text,
+                                                  title:
+                                                      "Start foreground color: ",
+                                                ),
+                                              if (radioCurrentValue ==
+                                                  setcolor.RadioButton.gradient)
+                                                _ColoredText(
+                                                  color: secondColor,
+                                                  controllerText:
+                                                      secondcolorController
+                                                          .text,
+                                                  title:
+                                                      "End foreground color: ",
+                                                ),
+                                              if (isCustomEyeColor)
+                                                _ColoredText(
+                                                  color: firsteyeColor,
+                                                  controllerText:
+                                                      firsteyecolorController
+                                                          .text,
+                                                  title: "First eye color: ",
+                                                ),
+                                              if (isCustomEyeColor)
+                                                _ColoredText(
+                                                  color: secondeyeColor,
+                                                  controllerText:
+                                                      secondeyecolorController
+                                                          .text,
+                                                  title: "Second eye color: ",
+                                                ),
+                                              _ColoredText(
+                                                color: backgroundColor ==
+                                                        Colors.white
                                                     ? Colors.black
                                                     : backgroundColor,
-                                            controllerText:
-                                                backgroundController.text,
-                                            title: "Background color: ",
-                                          ),
-                                          if (pickedImage.isNotEmpty)
-                                            Row(
-                                              children: [
-                                                Text("Image: "),
-                                                SizedBox(
-                                                  width: size.width * 0.2,
-                                                  height: size.width * 0.2,
-                                                  child: pickedImage
-                                                          .startsWith("http")
-                                                      ? Image.network(
-                                                          pickedImage)
-                                                      : Image.file(
-                                                          File(pickedImage)),
-                                                )
-                                              ],
-                                            ),
-                                          Row(
-                                            children: [
-                                              Text("Picked shape: "),
-                                              SizedBox(
-                                                  width: size.width * 0.2,
-                                                  height: size.width * 0.2,
-                                                  child:
-                                                      Image.asset(pickedShape))
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text("Picked eye: "),
-                                              SizedBox(
-                                                  width: size.width * 0.2,
-                                                  height: size.width * 0.2,
-                                                  child: Image.asset(pickedEye))
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text("Picked eye ball: "),
-                                              SizedBox(
-                                                  width: size.width * 0.1,
-                                                  height: size.width * 0.2,
-                                                  child: Image.asset(
-                                                      pickedEyeBallShape))
-                                            ],
-                                          ),
-                                          ElevatedButton(
-                                              onPressed: () => context
-                                                  .read<QrCodeCreatorCubit>()
-                                                  .generateQrCode(QrCodeConfigModel(
+                                                controllerText:
+                                                    backgroundController.text,
+                                                title: "Background color: ",
+                                              ),
+                                              if (pickedImage.isNotEmpty)
+                                                Row(
+                                                  children: [
+                                                    Text("Image: "),
+                                                    SizedBox(
+                                                      width: size.width * 0.2,
+                                                      height: size.width * 0.2,
+                                                      child: pickedImage
+                                                              .startsWith(
+                                                                  "http")
+                                                          ? CachedNetworkImage(
+                                                              imageUrl:
+                                                                  pickedImage,
+                                                            )
+                                                          : Image.file(File(
+                                                              pickedImage)),
+                                                    )
+                                                  ],
+                                                ),
+                                              Row(
+                                                children: [
+                                                  Text("Picked shape: "),
+                                                  SizedBox(
+                                                      width: size.width * 0.2,
+                                                      height: size.width * 0.2,
+                                                      child: Image.asset(
+                                                          pickedShape))
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text("Picked eye: "),
+                                                  SizedBox(
+                                                      width: size.width * 0.2,
+                                                      height: size.width * 0.2,
+                                                      child: Image.asset(
+                                                          pickedEye))
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text("Picked eye ball: "),
+                                                  SizedBox(
+                                                      width: size.width * 0.1,
+                                                      height: size.width * 0.2,
+                                                      child: Image.asset(
+                                                          pickedEyeBallShape))
+                                                ],
+                                              ),
+                                              ElevatedButton(
+                                                  onPressed: () => context.read<QrCodeCreatorCubit>().generateQrCode(QrCodeConfigModel(
                                                       data: linkController.text,
                                                       body: shapeTransformer(
                                                           pickedShape),
@@ -303,59 +350,17 @@ class _QrCodeAddBodyState extends State<QrCodeAddBody> with ChangeNotifier {
                                                       eyeBall1Color: "#" +
                                                           secondcolorController
                                                               .text,
-                                                      eyeBall2Color:
-                                                          "#" + secondcolorController.text,
+                                                      eyeBall2Color: "#" + secondcolorController.text,
                                                       eyeBall3Color: "#" + secondcolorController.text,
                                                       gradientColor1: currentGradient == null ? "" : "#" + firstcolorController.text,
                                                       gradientColor2: currentGradient == null ? "" : "#" + secondcolorController.text,
                                                       gradientType: currentGradient == null ? "" : currentGradient!.name.split("G").first.toLowerCase(),
                                                       gradientOnEyes: false,
                                                       logo: pickedImage == "" ? "https://firebasestorage.googleapis.com/v0/b/trionproj.appspot.com/o/initial_logos%2Fic_twitter_rounded.jpg?alt=media&token=48c60004-e7ea-400e-b731-20d36ac3fcae" : pickedImage)),
-                                              child: Text("Create QrCode"))
-                                        ],
-                                      ),
-                                    );
-                                  } else if (state is QrCodeLoadingState) {
-                                    return CircularProgressIndicator.adaptive();
-                                  } else if (state is QrCodeCreatorCreated) {
-                                    return Column(children: [
-                                      state.imagePath.startsWith("http")
-                                          ? Image.network(state.imagePath)
-                                          : Image.file(File(state.imagePath)),
-                                      Column(
-                                        children: [
-                                          ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                  primary: Colors.red[200]),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                context
-                                                    .read<QrCodeCreatorCubit>()
-                                                    .emit(
-                                                        QrCodeCreatorInitial());
-                                              },
-                                              child: Text("Discard code")),
-                                          ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                  primary: Colors.green[200]),
-                                              onPressed: () {
-                                                context.read<MainQrBloc>().add(
-                                                    SaveQrCode(
-                                                        this.pickedImage));
-                                                Navigator.of(context).pop();
-                                                context
-                                                    .read<QrCodeCreatorCubit>()
-                                                    .emit(
-                                                        QrCodeCreatorInitial());
-                                              },
-                                              child: Text("Save Qr code"))
-                                        ],
-                                      )
-                                    ]);
-                                  } else
-                                    return Container();
-                                },
-                              ),
+                                                  child: Text("Create QrCode"))
+                                            ],
+                                          ),
+                                        ))),
                       )),
               child: Text("Create QrCode!"))
         ],

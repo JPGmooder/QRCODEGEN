@@ -1,8 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:trionproj/consts/errors/Firebase_errors.dart';
-import 'package:trionproj/logic/authorization_bloc/authorization_provider.dart';
-import 'package:trionproj/logic/shared_preferences.dart';
+part of "authorization_bloc.dart";
+
 
 class AuthorizationRepository {
   static Future<void> signInViaGoogle(bool isSliently) async {

@@ -1,6 +1,6 @@
-import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+
+part of "qr_code_creator_cubit.dart";
 
 class QrCodeCreatorProvider {
   static Future<http.Response> getRawData(String codedQrCode) async =>

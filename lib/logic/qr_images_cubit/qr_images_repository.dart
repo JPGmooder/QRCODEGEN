@@ -1,7 +1,4 @@
-import 'dart:async';
-import 'dart:ffi';
-
-import 'package:trionproj/logic/qr_images_cubit/qr_images_provider.dart';
+part of "qr_images_cubit.dart";
 
 class QrImagesRepository {
   static Future<List<String>> getInitialLogosDowloadLinks() async {

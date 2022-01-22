@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,12 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trionproj/consts/strings.dart';
 import 'package:trionproj/logic/authorization_bloc/authorization_bloc.dart';
-import 'package:trionproj/logic/authorization_bloc/authorization_states.dart';
-import 'package:trionproj/logic/internet_connection_cubit.dart';
 import 'package:trionproj/logic/qr_bloc/main_qr_bloc.dart';
 import 'package:trionproj/logic/qr_code_creator_cubit/qr_code_creator_cubit.dart';
 import 'package:trionproj/logic/qr_images_cubit/qr_images_cubit.dart';
 import 'package:trionproj/view/authorization_screen/authorization_screen.dart';
+import 'package:trionproj/view/loading_screen.dart';
+import 'package:trionproj/view/loading_screend2.dart';
 import 'package:trionproj/view/onboarding_screen/onboarding.dart';
 import 'package:trionproj/view/qr_main_list/qr_main_list.dart';
 import 'package:trionproj/view/single_qrcode_screen/qr_code_screen.dart';
@@ -23,6 +22,7 @@ void main() async {
   await Firebase.initializeApp();
 
   var sharedprefs = await SharedPreferences.getInstance();
+  sharedprefs.clear();
   var typeOfAuth = sharedprefs.getString(spKeyTypeOfAuth);
   Map<String, String>? usersCredentials;
   if (typeOfAuth == spAuthTypeFirebase) {
@@ -56,12 +56,18 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
           title: 'Material App',
-          home: typeOfAuth == null
-              ? OnBoardingScreen()
-              : AuthRouter(
-                  typeOfAuth: typeOfAuth,
-                  usersCredentials: usersCredentials,
-                ),
+          home: Scaffold(
+              body:
+                  //     Stack(children: [
+                  //   LoadingScreen(),
+                  //   LoadingScreen2(),
+                  // ])),
+                  typeOfAuth == null
+                      ? OnBoardingScreen()
+                      : AuthRouter(
+                          typeOfAuth: typeOfAuth,
+                          usersCredentials: usersCredentials,
+                        )),
           onGenerateRoute: (settings) {
             if (settings.name == QRMainList) {
               return PageRouteBuilder(
@@ -107,18 +113,18 @@ class AuthRouter extends StatefulWidget {
 
 class _AuthRouterState extends State<AuthRouter> {
   late StreamSubscription streamSub;
+
   @override
   void initState() {
     var bloc = context.read<AuthorizationBloc>();
 
     streamSub = bloc.stream.listen((event) {
-      if (event is AuthorizationLogedIn) {
-        Navigator.of(context).pushReplacementNamed(QRMainList);
-      } else if (event is AuthorizationErrored) {
-        Navigator.of(context).pushReplacementNamed(
-          authorizationScreenRoute,
-        );
-      }
+      event.whenOrNull(
+          logedIn: (_) =>
+              Navigator.of(context).pushReplacementNamed(QRMainList),
+          errored: (_) => Navigator.of(context).pushReplacementNamed(
+                authorizationScreenRoute,
+              ));
     });
 
     widget.typeOfAuth == spAuthTypeGoogle
@@ -131,6 +137,11 @@ class _AuthRouterState extends State<AuthRouter> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      body: Stack(children: [
+        LoadingScreen(),
+        LoadingScreen2(),
+      ]),
+    );
   }
 }

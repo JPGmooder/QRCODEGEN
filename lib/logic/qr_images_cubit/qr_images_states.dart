@@ -1,16 +1,18 @@
-abstract class QrImageState {}
+part of "qr_images_cubit.dart";
 
-class QrImagesLoadedState extends QrImageState{
-  List<String> downloadList;
-  QrImagesLoadedState(this.downloadList);
+@freezed
+class QrImageState with _$QrImageState {
+  const factory QrImageState.loaded(List<String> downloadList) =
+      _QrImagesLoadedState;
+  const factory QrImageState.initial() = _QrImageInitialState;
+  const factory QrImageState.errored() = _QrImageErroredState;
 }
 
-class QrImageInitialState extends QrImageState
-{
-  
-}
+// class QrImagesLoadedState extends QrImageState {
+//   List<String> downloadList;
+//   QrImagesLoadedState(this.downloadList);
+// }
 
-class QrImageErroredState extends QrImageState
-{
+// class QrImageInitialState extends QrImageState {}
 
-}
+// class QrImageErroredState extends QrImageState {}

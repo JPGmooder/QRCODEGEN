@@ -1,9 +1,7 @@
-import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:trionproj/logic/qr_bloc/main_qr_events.dart';
+
+part of "main_qr_bloc.dart";
+
 
 class MainQrProvider {
   static Future<String> loadNewImageToAStorage(File fileToAdd) async {

@@ -1,36 +1,53 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:trionproj/consts/errors/Firebase_errors.dart';
-import 'package:trionproj/logic/authorization_bloc/authorization_events.dart';
-import 'package:trionproj/logic/authorization_bloc/authorization_repository.dart';
-import 'package:trionproj/logic/authorization_bloc/authorization_states.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:trionproj/logic/shared_preferences.dart';
+
+part "authorization_events.dart";
+part 'authorization_provider.dart';
+part 'authorization_repository.dart';
+part 'authorization_states.dart';
+
+part 'authorization_bloc.freezed.dart';
 
 class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   AuthorizationBloc() : super(AuthorizationInitial()) {
-    on<Auth_SignIn>((event, emit) async {
-      emit(AuthorizationLoadingState());
+    on<AuthSignInViaFirebase>((event, emit) async {
+      emit(AuthorizationState.loading());
       try {
-        if (event is Auth_SignUpViaGoogle) {
-          await AuthorizationRepository.signInViaGoogle(event.isSliently);
-          await SharedPreferencesLib.loginUser(true);
-        } else if (event is Auth_SignInViaFirebase) {
-          await AuthorizationRepository.signInViaFirebase(
-              event.login, event.password);
-          await SharedPreferencesLib.loginUser(false,
-              login: event.login, passwrod: event.password);
-        }
+        await AuthorizationRepository.signInViaFirebase(
+            event.login, event.password);
+        await SharedPreferencesLib.loginUser(false,
+            login: event.login, passwrod: event.password);
 
-        emit(AuthorizationLogedIn(event.isSliently));
+        emit(AuthorizationState.logedIn(isSilently: event.isSliently));
       } catch (e) {
-        emit.call(AuthorizationErrored(AuthentificationError(
-            (e as FirebaseAuthException).message.toString())));
+        emit.call(AuthorizationState.errored(
+            error: AuthentificationError(
+                (e as FirebaseAuthException).message.toString())));
       }
     });
 
-    on<Auth_SignUpViaFirebase>((event, emit) async {
+    on<AuthSignUpViaGoogle>((event, emit) async {
+      emit(AuthorizationState.loading());
       try {
-        emit(AuthorizationLoadingState());
+        await AuthorizationRepository.signInViaGoogle(event.isSliently);
+        await SharedPreferencesLib.loginUser(true);
+
+        emit(AuthorizationState.logedIn(isSilently: event.isSliently));
+      } catch (e) {
+        emit.call(AuthorizationState.errored(
+            error: AuthentificationError(
+                (e as FirebaseAuthException).message.toString())));
+      }
+    });
+
+    on<AuthSignUpViaFirebase>((event, emit) async {
+      try {
+        emit(AuthorizationState.loading());
 
         await AuthorizationRepository.signUpViaFirebase(
             event.login, event.password);
@@ -38,23 +55,25 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
         await SharedPreferencesLib.loginUser(false,
             login: event.login, passwrod: event.password);
 
-        emit(AuthorizationLogedIn(false));
+        emit(AuthorizationState.logedIn(isSilently: false));
       } catch (e) {
-        emit(AuthorizationErrored(
-            AuthentificationError((e as FirebaseAuthException).message!)));
+        emit(AuthorizationState.errored(
+            error:
+                AuthentificationError((e as FirebaseAuthException).message!)));
       }
     });
   }
 
   void signInViaGoogle(bool isSilent) {
-    add(Auth_SignUpViaGoogle(isSilent));
+    add(AuthorizationEvent.signUpViaGoogle(isSliently: isSilent));
   }
 
   void signInViaFirebase(String login, String password) {
-    add(Auth_SignInViaFirebase(false, login: login, password: password));
+    add(AuthorizationEvent.signInViaFirebase(
+        isSliently: false, login: login, password: password));
   }
 
   void signUpViaFirebase(String login, String password) {
-    add(Auth_SignUpViaFirebase(login: login, password: password));
+    add(AuthorizationEvent.signUpViaFirebase(login: login, password: password));
   }
 }

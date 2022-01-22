@@ -1,19 +1,12 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trionproj/consts/colors.dart';
 import 'package:trionproj/consts/strings.dart';
 import 'package:trionproj/logic/qr_bloc/main_qr_bloc.dart';
-import 'package:trionproj/logic/qr_bloc/main_qr_events.dart';
-import 'package:trionproj/logic/qr_bloc/main_qr_states.dart';
-import 'package:trionproj/logic/shared_preferences.dart';
-import 'package:trionproj/main.dart';
+
 import 'package:trionproj/models/textstyles.dart';
 import 'package:trionproj/view/qr_main_list/qr_code_add_widget.dart';
 import 'package:trionproj/view/qr_main_list/qr_code_widget.dart';
@@ -80,21 +73,18 @@ class _MainListBodyState extends State<MainListBody> {
     super.initState();
     context.read<MainQrBloc>().add(LoadQrCodes());
 
-    sub = BlocProvider.of<MainQrBloc>(context).stream.listen((state) {
-      if (state is QrListLoadedState) {
-        setState(() {
-          widget.qrCodes = state.downloadUrls;
-        });
-      } else if (state is QrDeletedState) {
-        setState(() {
-          widget.qrCodes.remove(state.deletedUrl);
-        });
-      } else if (state is QrSavedState) {
-        setState(() {
-          widget.qrCodes.add(state.downloadUrl);
-        });
-      }
-    });
+    sub = BlocProvider.of<MainQrBloc>(context)
+        .stream
+        .listen((state) => state.whenOrNull(
+            loaded: (urlList) => setState(() {
+                  widget.qrCodes = urlList;
+                }),
+            deleted: (url) => setState(() {
+                  widget.qrCodes.remove(url);
+                }),
+            saved: (url) => setState(() {
+                  widget.qrCodes.add(url);
+                })));
   }
 
   @override
