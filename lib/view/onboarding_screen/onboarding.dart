@@ -13,9 +13,7 @@ class OnBoardingScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) => constraints.maxWidth > 400
-              ? Container()
-              : Stack(children: [
+          builder: (context, constraints) => Stack(children: [
                   Image.asset(onBoardBackground),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

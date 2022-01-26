@@ -32,7 +32,7 @@ void main() async {
     };
   }
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+ // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(MyApp(
     typeOfAuth: typeOfAuth,

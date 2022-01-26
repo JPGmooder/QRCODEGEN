@@ -1,9 +1,12 @@
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:trionproj/consts/colors.dart';
+import 'package:trionproj/logic/shared_preferences.dart';
+import 'package:trionproj/view/standalone_widgets/termofuse_widget.dart';
 
 class SwitcherWidget extends StatefulWidget {
   SwitcherWidget(
@@ -35,8 +38,18 @@ class _SwitcherWidgetState extends State<SwitcherWidget> {
     widget.activeDotColor ??= mainColor.withAlpha(50);
     _controller = CarouselController();
     Future.delayed(Duration.zero).then((_) => _controller.startAutoPlay());
-    // TODO: implement initState
+
     super.initState();
+
+    SharedPreferencesLib.checkTermsOfUse().then((isAgreed) {
+      if (!isAgreed) {
+        
+        showDialog(builder: (context) => TermsOfUse(), context: context)
+            .then((value) async {
+          await SharedPreferencesLib.regTermsOfUse(value);
+        });
+      }
+    });
   }
 
   @override

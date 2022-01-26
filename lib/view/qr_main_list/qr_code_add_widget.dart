@@ -16,7 +16,6 @@ import 'package:trionproj/view/qr_main_list/qr_code_customizedesign_widget.dart'
 
 class QrCodeAddBody extends StatefulWidget {
   QrCodeAddBody({Key? key}) : super(key: key);
-  //* EnterContent
 
   @override
   State<QrCodeAddBody> createState() => _QrCodeAddBodyState();
