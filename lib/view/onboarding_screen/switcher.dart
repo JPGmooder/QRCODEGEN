@@ -43,7 +43,6 @@ class _SwitcherWidgetState extends State<SwitcherWidget> {
 
     SharedPreferencesLib.checkTermsOfUse().then((isAgreed) {
       if (!isAgreed) {
-        
         showDialog(builder: (context) => TermsOfUse(), context: context)
             .then((value) async {
           await SharedPreferencesLib.regTermsOfUse(value);

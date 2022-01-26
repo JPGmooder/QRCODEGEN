@@ -22,7 +22,6 @@ void main() async {
   await Firebase.initializeApp();
 
   var sharedprefs = await SharedPreferences.getInstance();
-  sharedprefs.clear();
   var typeOfAuth = sharedprefs.getString(spKeyTypeOfAuth);
   Map<String, String>? usersCredentials;
   if (typeOfAuth == spAuthTypeFirebase) {
@@ -32,7 +31,7 @@ void main() async {
     };
   }
 
- // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(MyApp(
     typeOfAuth: typeOfAuth,
